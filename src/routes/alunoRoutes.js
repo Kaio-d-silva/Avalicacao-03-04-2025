@@ -1,9 +1,9 @@
 const express = require('express')
 const router = express.Router()
-const User = require('../models/user-model')
+const Aluno = require('../models/aluno-model')
 
 
-let alunos = []
+
 
 /**
  * @swagger
@@ -35,6 +35,7 @@ let alunos = []
  *           type: string
  *           description: A Turma aluno
  *       example:
+ *         id: 1
  *         nome: João da Silva
  *         idade: 20
  *         turma: Desenvolvimento de sistemas
@@ -69,10 +70,12 @@ let alunos = []
 
 
 router.post('/alunos', async (req, res) => {
-    const aluno = req.body
-    console.log(aluno)
-    aluno = await User.create(aluno)
-    res.status(201).json(aluno).send("Aluno criado com sucesso")
+    try {
+        const aluno = await Aluno.create(req.body)
+        res.status(201).json(aluno)            
+    } catch (error) {
+        res.status(400).json({error: error.message})
+    }
 })
 
 /**
@@ -93,8 +96,13 @@ router.post('/alunos', async (req, res) => {
  */
 
 router.get('/alunos', async (req, res) => {
-    const alunosBanco = await User.findAll()
-    res.json(alunosBanco)
+    try {
+        const alunos = await Aluno.findAll()
+        res.json(alunos)
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
+   
 })
 
 /**
@@ -125,12 +133,20 @@ router.get('/alunos', async (req, res) => {
  *         description: Algum erro aconteceu
  */
 
-router.put('/alunos/:id', (req, res) => {
-    const alunoId = req.params.id
-    const updateAluno = req.body
-    alunos = alunos.map(aluno => aluno.id === alunoId ? updateAluno : aluno )
-    res.status(200).json(updateAluno).send("aluno atualizado com sucesso")
+router.put('/alunos/:id', async (req, res) => {
+    try {
+        const aluno = await Aluno.findByPk(req.params.id)
+        if (aluno){
+            await Aluno.update(req.body);
+            res.json(aluno)
+        }else{
+            res.status(404).json({error: 'Aluno not found'})
+        }  
+    } catch (error) {
+        res.status(400).json({error: error.message})
+    }
 })
+
 
 /**
  * @swagger
@@ -154,8 +170,23 @@ router.put('/alunos/:id', (req, res) => {
  *         description: Algum erro aconteceu
  */
 
-router.delete('/alunos/:id', (req, res) => {
+router.delete('/alunos/:id', async (req, res) => {
+    try {
+        const aluno = await Aluno.findOne(req.params.id)
+        if (user){
+            await Aluno.destroy()
+            res.json({message: 'Aluno deletado com sucesso'})
+        }else{
+            res.status(404).json({error: "Aluno not found"})
+        }
+
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
+
+
     const alunoId = req.params.id
+
     alunos = alunos.filter(aluno => aluno.id !== alunoId )
     res.send('Aluno deletado com sucesso')
 })

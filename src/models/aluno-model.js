@@ -1,10 +1,10 @@
 const { DataTypes } = require('sequelize') 
 const sequelize = require('../database')
 
-const User = sequelize.define('User', {
+const Aluno = sequelize.define('Aluno', {
     id:{
-        primaryKey: true,
         type: DataTypes.INTEGER,
+        primaryKey: true,
         autoIncrement: true
     },
     nome:{
@@ -21,4 +21,4 @@ const User = sequelize.define('User', {
     }
 })
 
-module.exports = User
+module.exports = Aluno
