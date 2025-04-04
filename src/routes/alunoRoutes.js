@@ -35,7 +35,6 @@ const Aluno = require('../models/aluno-model')
  *           type: string
  *           description: A Turma aluno
  *       example:
- *         id: 1
  *         nome: João da Silva
  *         idade: 20
  *         turma: Desenvolvimento de sistemas
@@ -137,7 +136,7 @@ router.put('/alunos/:id', async (req, res) => {
     try {
         const aluno = await Aluno.findByPk(req.params.id)
         if (aluno){
-            await Aluno.update(req.body);
+            await aluno.update(req.body);
             res.json(aluno)
         }else{
             res.status(404).json({error: 'Aluno not found'})
@@ -172,9 +171,9 @@ router.put('/alunos/:id', async (req, res) => {
 
 router.delete('/alunos/:id', async (req, res) => {
     try {
-        const aluno = await Aluno.findOne(req.params.id)
-        if (user){
-            await Aluno.destroy()
+        const aluno = await Aluno.findByPk(req.params.id)
+        if (aluno){
+            await aluno.destroy()
             res.json({message: 'Aluno deletado com sucesso'})
         }else{
             res.status(404).json({error: "Aluno not found"})
@@ -184,11 +183,6 @@ router.delete('/alunos/:id', async (req, res) => {
         res.status(500).json({error: error.message})
     }
 
-
-    const alunoId = req.params.id
-
-    alunos = alunos.filter(aluno => aluno.id !== alunoId )
-    res.send('Aluno deletado com sucesso')
 })
 
 module.exports = router
